@@ -28,6 +28,7 @@ import CardHeader from "../../components/Card/CardHeader";
 import CardIcon from "../../components/Card/CardIcon";
 import CardBody from "../../components/Card/CardBody";
 import CardFooter from "../../components/Card/CardFooter";
+import Button from "../../components/Button/Button";
 
 import { bugs, website, server } from "../../variables/general";
 
@@ -39,12 +40,18 @@ import {
 
 import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle";
 
+import api from '../../server/api';
+
 interface Props {
   classes: any;
 }
 
 interface State {
   value: number;
+  dados: Array<any>;
+  totalCases: Array<any>;
+  country: Array<any>;
+  region: Array<any>;
 }
 
 class Dashboard extends React.Component<Props, State> {
@@ -52,11 +59,18 @@ class Dashboard extends React.Component<Props, State> {
     super(props);
     this.state = {
       value: 0,
+      dados: [],
+      totalCases: [{ "cases": 0, "deaths": 0, "suspects": 0, "refuses": 0 }],
+      country: [],
+      region:[{
+        "North":[],"South":[],"Southeast":[],"Midwest":[], "Northeast":[],
+      }]
+
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeIndex = this.handleChangeIndex.bind(this);
   }
-  handleChange = (event: any, value: number) => {
+  handleChange = (event: any, value: number, teste: number) => {
     this.setState({ value });
   };
 
@@ -64,8 +78,50 @@ class Dashboard extends React.Component<Props, State> {
     this.setState({ value: index });
   };
 
+  calcTotalCases(): void {
+    let totalCases = this.state.totalCases;
+    let arrayOfElements = this.state.dados;
+    arrayOfElements.forEach(function (object) {
+      totalCases[0].cases += object.cases;
+      totalCases[0].deaths += object.deaths;
+      totalCases[0].suspects += object.suspects;
+      totalCases[0].refuses += object.refuses;
+    })
+    this.setState({ totalCases: totalCases });
+  };
+  transformObjectinArrayOfArray(object: Array<any>) {
+    return object.map(obj =>
+      Object.values(obj)
+    );
+  }
+  async Top4Country() {
+    console.log('ativo');
+    const resposendeCountry = await api.get('countries');
+    let object = resposendeCountry.data.data;
+    let arrayOfElements = this.transformObjectinArrayOfArray(object);
+    let newArray: Array<any> = [];
+    arrayOfElements.sort((a: any, b: any) => b[1] - a[1]);
+    arrayOfElements.forEach((element, index) => {
+      element.unshift(index + 1);
+      newArray = [...newArray, element.slice(0, 5)];
+    })
+    this.setState({ country: newArray.splice(0, 5) });
+  }
+
+  async filterByRegion() {
+
+  }
+
+  async componentDidMount() {
+    const response = await api.get('');
+    this.setState({ dados: response.data.data });
+    this.calcTotalCases();
+    this.Top4Country();
+  }
+
   render() {
     const { classes } = this.props;
+
     return (
       <div>
         <GridContainer>
@@ -75,13 +131,13 @@ class Dashboard extends React.Component<Props, State> {
                 <CardIcon color="success">
                   <Store />
                 </CardIcon>
-                <p className={classes.cardCategory}>Revenue</p>
-                <h3 className={classes.cardTitle}>$34,245</h3>
+                <p className={classes.cardCategory}>Tota de Casos</p>
+                <h3 className={classes.cardTitle}>{this.state.totalCases[0].cases}</h3>
               </CardHeader>
               <CardFooter stats={true}>
                 <div className={classes.stats}>
                   <DateRange />
-                  Last 24 Hours
+                  Últimas 24 Horas
                 </div>
               </CardFooter>
             </Card>
@@ -92,10 +148,8 @@ class Dashboard extends React.Component<Props, State> {
                 <CardIcon color="warning">
                   <Icon>content_copy</Icon>
                 </CardIcon>
-                <p className={classes.cardCategory}>Used Space</p>
-                <h3 className={classes.cardTitle}>
-                  49/50 <small>GB</small>
-                </h3>
+                <p className={classes.cardCategory}>Suspeitos</p>
+                <h3 className={classes.cardTitle}>{this.state.totalCases[0].suspects}</h3>
               </CardHeader>
               <CardFooter stats={true}>
                 <div className={classes.stats}>
@@ -111,12 +165,12 @@ class Dashboard extends React.Component<Props, State> {
           </GridItem>
           <GridItem xs={12} sm={6} md={3}>
             <Card>
-              <CardHeader color="danger" stats={true} icon={true}>
-                <CardIcon color="danger">
+              <CardHeader color="success" stats={true} icon={true}>
+                <CardIcon color="success">
                   <Icon>info_outline</Icon>
                 </CardIcon>
-                <p className={classes.cardCategory}>Fixed Issues</p>
-                <h3 className={classes.cardTitle}>75</h3>
+                <p className={classes.cardCategory}>Curados</p>
+                <h3 className={classes.cardTitle}>{this.state.totalCases[0].refuses}</h3>
               </CardHeader>
               <CardFooter stats={true}>
                 <div className={classes.stats}>
@@ -132,8 +186,8 @@ class Dashboard extends React.Component<Props, State> {
                 <CardIcon color="info">
                   <Accessibility />
                 </CardIcon>
-                <p className={classes.cardCategory}>Followers</p>
-                <h3 className={classes.cardTitle}>+245</h3>
+                <p className={classes.cardCategory}>Mortes</p>
+                <h3 className={classes.cardTitle}>{this.state.totalCases[0].deaths}</h3>
               </CardHeader>
               <CardFooter stats={true}>
                 <div className={classes.stats}>
@@ -145,7 +199,7 @@ class Dashboard extends React.Component<Props, State> {
           </GridItem>
         </GridContainer>
         <GridContainer>
-          <GridItem xs={12} sm={12} md={4}>
+          <GridItem xs={12} sm={12} md={12}>
             <Card chart={true}>
               <CardHeader color="success">
                 <ChartistGraph
@@ -170,7 +224,7 @@ class Dashboard extends React.Component<Props, State> {
               </CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
+          <GridItem xs={12} sm={12} md={6}>
             <Card chart={true}>
               <CardHeader color="warning">
                 <ChartistGraph
@@ -192,7 +246,7 @@ class Dashboard extends React.Component<Props, State> {
               </CardFooter>
             </Card>
           </GridItem>
-          <GridItem xs={12} sm={12} md={4}>
+          <GridItem xs={12} sm={12} md={6}>
             <Card chart={true}>
               <CardHeader color="danger">
                 <ChartistGraph
@@ -218,39 +272,62 @@ class Dashboard extends React.Component<Props, State> {
         <GridContainer>
           <GridItem xs={12} sm={12} md={6}>
             <CustomTabs
-              title="Tasks:"
+              title="Por região:"
               headerColor="primary"
               tabs={[
                 {
-                  tabName: "Bugs",
-                  tabIcon: BugReport,
-                  tabContent: (
-                    <Tasks
-                      checkedIndexes={[0, 3]}
-                      tasksIndexes={[0, 1, 2, 3]}
-                      tasks={bugs}
-                    />
-                  ),
-                },
-                {
-                  tabName: "Website",
-                  tabIcon: Code,
-                  tabContent: (
-                    <Tasks
-                      checkedIndexes={[0]}
-                      tasksIndexes={[0, 1]}
-                      tasks={website}
-                    />
-                  ),
-                },
-                {
-                  tabName: "Server",
+                  tabName: "Sudeste",
                   tabIcon: Cloud,
                   tabContent: (
-                    <Tasks
-                      checkedIndexes={[1]}
-                      tasksIndexes={[0, 1, 2]}
-                      tasks={server}
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["Posição", "Estado", "Casos", "Confirmados", "Curados"]}
+                      tableData={this.state.country}
+                    />
+                  ),
+                },
+                {
+                  tabName: "Norte",
+                  tabIcon: Cloud,
+                  tabContent: (
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["Posição", "Estado", "Casos", "Confirmados", "Curados"]}
+                      tableData={this.state.country}
+                    />
+                  ),
+                },
+                {
+                  tabName: "Centro-Oeste",
+                  tabIcon: Cloud,
+                  tabContent: (
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["Posição", "Estado", "Casos", "Confirmados", "Curados"]}
+                      tableData={this.state.country}
+                    />
+                  ),
+                },
+                {
+                  tabName: "Nordeste",
+                  tabIcon: Cloud,
+                  tabContent: (
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["Posição", "Estado", "Casos", "Confirmados", "Curados"]}
+                      tableData={this.state.country}
+                      total={10}
+                    />
+                  ),
+                },
+                {
+                  tabName: "Sul",
+                  tabIcon: Cloud,
+                  tabContent: (
+                    <Table
+                      tableHeaderColor="primary"
+                      tableHead={["Posição", "Estado", "Casos", "Confirmados", "Curados",]}
+                      tableData={this.state.country}
                     />
                   ),
                 },
@@ -260,21 +337,17 @@ class Dashboard extends React.Component<Props, State> {
           <GridItem xs={12} sm={12} md={6}>
             <Card>
               <CardHeader color="warning">
-                <h4 className={classes.cardTitleWhite}>Employees Stats</h4>
+                <Button className="float-right" name="Buscar" />
+                <h4 className={classes.cardTitleWhite}>Países com mais casos</h4>
                 <p className={classes.cardCategoryWhite}>
-                  New employees on 15th September, 2016
+                  Atualizado desde 01/08/2020
                 </p>
               </CardHeader>
               <CardBody>
                 <Table
                   tableHeaderColor="warning"
-                  tableHead={["ID", "Name", "Salary", "Country"]}
-                  tableData={[
-                    ["1", "Dakota Rice", "$36,738", "Niger"],
-                    ["2", "Minerva Hooper", "$23,789", "Curaçao"],
-                    ["3", "Sage Rodriguez", "$56,142", "Netherlands"],
-                    ["4", "Philip Chaney", "$38,735", "Korea, South"],
-                  ]}
+                  tableHead={["Posição", "País", "Casos", "Confirmados", "Curados"]}
+                  tableData={this.state.country}
                 />
               </CardBody>
             </Card>
@@ -286,3 +359,40 @@ class Dashboard extends React.Component<Props, State> {
 }
 
 export default withStyles(dashboardStyle)(Dashboard);
+
+/*
+Região Norte de 11 a 17
+Região Nordeste 21 a 29
+Região Sudeste 31 a 35
+Região Sul 41 a 43
+Região Centro-Oeste 50 a 53
+*/
+enum valurForState {
+  RO = 11,
+  AC,
+  AM,
+  RR,
+  PA,
+  AP,
+  TO,
+  MA = 21,
+  PI,
+  CE,
+  RN,
+  PB,
+  PE,
+  AL,
+  SE,
+  BA,
+  MG = 31,
+  ES,
+  RJ,
+  SP = 35,
+  PR = 41,
+  SC,
+  RS,
+  MS = 50,
+  MT,
+  GO,
+  DF,
+}

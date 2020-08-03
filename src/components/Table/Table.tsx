@@ -44,6 +44,16 @@ function CustomTable({ ...props }: any) {
               </TableRow>
             );
           })}
+          {(props.total !== undefined) ?
+            <>
+              <TableCell className={classes.tableCell}>
+                Total
+              </TableCell>
+              <TableCell className={classes.tableCell}></TableCell>
+              <TableCell className={classes.tableCell}>15000</TableCell>
+              <TableCell className={classes.tableCell}>7500</TableCell>
+            </> : null
+          }
         </TableBody>
       </Table>
     </div>
