@@ -1,3 +1,32 @@
 .float-right {
     float: right;
 }
+.MuiPagination-ul {
+    margin: 0;
+    display: flex;
+    padding: 0;
+    flex-wrap: wrap;
+    list-style: none;
+    align-items: center;
+}
+.center-nav{
+    display: flex;
+    justify-content: center;
+}
+.mt-10{
+    margin-top: 10px;
+}
+
+.flex-end{
+    display: flex;
+    justify-content: flex-end;
+}
+.ct-series-a .ct-area, .ct-series-a .ct-slice-donut-solid, .ct-series-a .ct-slice-pie{
+    fill: #ff6961 !important;
+}
+.ct-series-b .ct-area, .ct-series-b .ct-slice-donut-solid, .ct-series-b .ct-slice-pie {
+    fill: #939 !important;
+}
+.ct-label{
+    fill:black !important;
+}

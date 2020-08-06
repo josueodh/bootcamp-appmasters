@@ -2,6 +2,7 @@
 // // // javascript library for creating charts
 // #############################
 import Chartist from 'chartist';
+import { red, lightBlue } from '@material-ui/core/colors';
 
 // ##############################
 // // // variables used to create animation on charts
@@ -17,8 +18,10 @@ var delays2 = 80,
 
 export const dailySalesChart = {
   data: {
-    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-    series: [[12, 17, 7, 17, 23, 18, 38]]
+    label: [
+      'AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI', 'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'
+    ],
+
   },
   options: {
     lineSmooth: Chartist.Interpolation.cardinal({
@@ -35,7 +38,7 @@ export const dailySalesChart = {
   },
   // for animation
   animation: {
-    draw: function(data: any) {
+    draw: function (data: any) {
       if (data.type === 'line' || data.type === 'area') {
         data.element.animate({
           d: {
@@ -64,7 +67,36 @@ export const dailySalesChart = {
     }
   }
 };
+export const pieChart = {
+  data: {
+    labels: ['Mortes', 'Curados'],
+  },
+  options: {
+    axisX: {
+      showGrid: false
+    },
+    low: 0,
+    high: 1000,
+    chartPadding: {
+      top: 0,
+      right: 5,
+      bottom: 0,
+      left: 0
+    },
+    datasets:{
+      
+    }
+  },
+  responsiveOptions: {
+    chartPadding: 30,
+    labelOffset: 100,
+    labelDirection: 'explode',
+  },
+  legend:{
+    position:'bottom',
+  }
 
+}
 // ##############################
 // // // Email Subscriptions
 // #############################
@@ -72,20 +104,9 @@ export const dailySalesChart = {
 export const emailsSubscriptionChart = {
   data: {
     labels: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'Mai',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
+      'Norte', 'Nordeste', 'Sul', 'Sudeste', 'Centro-Oeste'
     ],
-    series: [[542, 443, 320, 780, 553, 453, 326, 434, 568, 610, 756, 895]]
+    series: [[542, 443, 320, 780, 553]]
   },
   options: {
     axisX: {
@@ -106,7 +127,7 @@ export const emailsSubscriptionChart = {
       {
         seriesBarDistance: 5,
         axisX: {
-          labelInterpolationFnc: function(value: any) {
+          labelInterpolationFnc: function (value: any) {
             return value[0];
           }
         }
@@ -114,7 +135,7 @@ export const emailsSubscriptionChart = {
     ]
   ],
   animation: {
-    draw: function(data: any) {
+    draw: function (data: any) {
       if (data.type === 'bar') {
         data.element.animate({
           opacity: {
@@ -153,8 +174,8 @@ export const completedTasksChart = {
     }
   },
   animation: {
-    draw: function(data: any) {
-      if (data.type === 'line' || data.type === 'area') {
+    draw: function (data: any) {
+      if (data.type === 'pie' || data.type === 'area') {
         data.element.animate({
           d: {
             begin: 600,
