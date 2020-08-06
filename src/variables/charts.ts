@@ -2,6 +2,7 @@
 // // // javascript library for creating charts
 // #############################
 import Chartist from 'chartist';
+
 import { red, lightBlue } from '@material-ui/core/colors';
 
 // ##############################
@@ -83,8 +84,8 @@ export const pieChart = {
       bottom: 0,
       left: 0
     },
-    datasets:{
-      
+    datasets: {
+
     }
   },
   responsiveOptions: {
@@ -92,8 +93,8 @@ export const pieChart = {
     labelOffset: 100,
     labelDirection: 'explode',
   },
-  legend:{
-    position:'bottom',
+  legend: {
+    position: 'bottom',
   }
 
 }
@@ -106,7 +107,7 @@ export const emailsSubscriptionChart = {
     labels: [
       'Norte', 'Nordeste', 'Sul', 'Sudeste', 'Centro-Oeste'
     ],
-    series: [[542, 443, 320, 780, 553]]
+    series: [[542, 443, 320, 780, 553], [542, 443, 320, 780, 553],]
   },
   options: {
     axisX: {

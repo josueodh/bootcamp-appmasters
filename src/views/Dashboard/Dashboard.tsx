@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 // react plugin for creating charts
 import ChartistGraph from "react-chartist";
 // @material-ui/core
 import withStyles from "@material-ui/core/styles/withStyles";
-import Icon from "@material-ui/core/Icon";
+
 // @material-ui/icons
-import AccessTime from "@material-ui/icons/AccessTime";
 import Cloud from "@material-ui/icons/Cloud";
 import WarningIcon from '@material-ui/icons/Warning';
 import LocalHospitalIcon from '@material-ui/icons/LocalHospital';
@@ -20,30 +19,25 @@ import CustomTabs from "../../components/CustomTabs/CustomTabs";
 import Card from "../../components/Card/Card";
 import CardHeader from "../../components/Card/CardHeader";
 import CardBody from "../../components/Card/CardBody";
-import CardFooter from "../../components/Card/CardFooter";
 import CardDashboard from "../../components/CardDashboard";
 import BasicPaginantion from "../../components/BasicPagination/BasicPagination";
 import Select from "../../components/CustomSelect/SelectText";
-import SearchInput from "../../components/CustomInput/SearchInput";
-import CustomInput from "../../components/CustomInput/CustomInput";
-import { InputLabel, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import TextField from '@material-ui/core/TextField';
+import PieChartGraph from '../../components/Chart/PieChart';
 
 
 import moment from "moment";
 import "moment/locale/pt-br";
 
 import {
-  dailySalesChart,
   emailsSubscriptionChart,
-  completedTasksChart,
   pieChart,
 } from "../../variables/charts";
 
 import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle";
 
 import api from '../../server/api';
-import { title } from "../../assets/jss/material-dashboard-react";
 
 interface Props {
   classes: any;
@@ -73,13 +67,6 @@ interface Response {
   datetime: string;
 }
 
-interface Region {
-  North: Array<any>
-  South: Array<any>
-  Southeast: Array<any>
-  Midwest: Array<any>
-  Northeast: Array<any>
-}
 
 /*
 const mockData: CardDash[] = [
@@ -137,7 +124,7 @@ class Dashboard extends React.Component<Props, State> {
     this.handleChangeIndex = this.handleChangeIndex.bind(this);
   }
 
-  handleChange = (event: any, value: number, teste: number) => {
+  handleChange = (event: any, value: number) => {
     this.setState({ value });
   };
 
@@ -145,10 +132,6 @@ class Dashboard extends React.Component<Props, State> {
     this.setState({ value: index });
   };
 
-  handleSearch = (event: any) => {
-    console.log(event.target.value, 'alo');
-    this.setState({ search: event.target.value.substr(0, 20) });
-  }
 
   filterByRegion = () => {
     //linha para auxiliar na filtragem
@@ -188,7 +171,7 @@ class Dashboard extends React.Component<Props, State> {
     const response = await api.get('').then((res) => res.data) as { data: Response[] };
     this.setState({ data: response.data });
     const responseBrazil = await api.get('/brazil').then(res => res.data);
-    this.setState({ brazil: [responseBrazil.data.cases, responseBrazil.data.recovered] })
+    this.setState({ brazil: [responseBrazil.data.cases, responseBrazil.data.deaths] })
     this.filterByRegion();
     this.filterByState('SP');
     this.attCharts();
@@ -286,10 +269,14 @@ class Dashboard extends React.Component<Props, State> {
               <CardHeader color="warning">
                 <ChartistGraph
                   className="ct-chart"
-                  data={{
-                    labels: ['Norte', 'Nordeste', 'Sul', 'Sudeste', 'Centro-Oeste'],
-                    series: [this.state.totalRegion]
-                  }}
+                  /*data={{
+                    labels: ['Norte', 'Nordeste', 'Sudeste', 'Sul', 'Centro-Oeste'],
+                    series: [
+                      [this.state.totalRegion],
+                      [this.state.totalRegion]
+                    ]
+                  }}*/
+                  data={emailsSubscriptionChart.data}
                   type="Bar"
                 />
               </CardHeader>
@@ -301,11 +288,16 @@ class Dashboard extends React.Component<Props, State> {
           <GridItem xs={12} sm={12} md={6}>
             <Card chart={true}>
               <CardHeader color="info">
-                <ChartistGraph
-                  className="ct-chart"
-                  data={{ labels: ['Mortes', 'Curados'], series: this.state.brazil }}
-                  type="Pie"
-                />
+                <PieChartGraph data={[
+                  {
+                    "name": "Mortes",
+                    "value": this.state.brazil[0]
+                  },
+                  {
+                    "name": "Curados",
+                    "value": this.state.brazil[1]
+                  },
+                ]} />
               </CardHeader>
               <CardBody>
                 <h4 className={classes.cardTitle}>Mortes x Curados</h4>
@@ -457,12 +449,12 @@ class Dashboard extends React.Component<Props, State> {
                     ]
                   })}
                 />
-                <BasicPaginantion statePerPage={this.state.statePerPage} totalState={27} currentPage={this.state.currentPage} paginate={paginate}></BasicPaginantion>
+                <BasicPaginantion statePerPage={this.state.statePerPage} totalState={filter.length} currentPage={this.state.currentPage} paginate={paginate}></BasicPaginantion>
               </CardBody>
             </Card>
           </GridItem>
         </GridContainer>
-      </div>
+      </div >
     );
   }
 }
