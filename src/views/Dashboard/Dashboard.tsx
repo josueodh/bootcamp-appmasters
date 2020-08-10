@@ -21,8 +21,7 @@ import CardHeader from "../../components/Card/CardHeader";
 import CardBody from "../../components/Card/CardBody";
 import CardDashboard from "../../components/CardDashboard";
 import BasicPaginantion from "../../components/BasicPagination/BasicPagination";
-import Select from "../../components/CustomSelect/SelectText";
-import { Grid } from "@material-ui/core";
+import { Grid, MenuItem } from "@material-ui/core";
 import TextField from '@material-ui/core/TextField';
 import PieChartGraph from '../../components/Chart/PieChart';
 
@@ -34,7 +33,7 @@ import {
   emailsSubscriptionChart,
   pieChart,
 } from "../../variables/charts";
-
+import { currencies } from "../../variables/select";
 import dashboardStyle from "../../assets/jss/material-dashboard-react/views/dashboardStyle";
 
 import api from '../../server/api';
@@ -55,6 +54,7 @@ interface State {
   statePerPage: number,
   brazil: Array<any>,
   search: string,
+  select: string,
 }
 
 interface Response {
@@ -108,6 +108,7 @@ class Dashboard extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
     this.state = {
+      select: 'MG',
       value: 0,
       data: [],
       region: [],
@@ -127,7 +128,10 @@ class Dashboard extends React.Component<Props, State> {
   handleChange = (event: any, value: number) => {
     this.setState({ value });
   };
-
+  handleChangeSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState({ select: event.target.value });
+    this.filterByState(event.target.value);
+  };
   handleChangeIndex = (index: number) => {
     this.setState({ value: index });
   };
@@ -173,7 +177,7 @@ class Dashboard extends React.Component<Props, State> {
     const responseBrazil = await api.get('/brazil').then(res => res.data);
     this.setState({ brazil: [responseBrazil.data.cases, responseBrazil.data.deaths] })
     this.filterByRegion();
-    this.filterByState('SP');
+    this.filterByState(this.state.select);
     this.attCharts();
   }
   filterByState = (parameter: string) => {
@@ -193,6 +197,7 @@ class Dashboard extends React.Component<Props, State> {
   }
 
 
+
   render() {
     const { classes } = this.props;
     let filter = this.state.data.filter(data => {
@@ -206,7 +211,21 @@ class Dashboard extends React.Component<Props, State> {
 
     return (
       <div>
-        <Select />
+        <form noValidate className="flex-end" autoComplete="off">
+          <TextField
+            id="standard-select-currency"
+            select
+            label="Selecione"
+            value={this.state.select}
+            onChange={this.handleChangeSearch}
+          >
+            {currencies.map((option) => (
+              <MenuItem key={option.value} value={option.value}>
+                {option.label}
+              </MenuItem>
+            ))}
+          </TextField>
+        </form>
         <GridContainer>
           <GridItem xs={12} sm={6} md={6}>
             <CardDashboard
@@ -427,7 +446,7 @@ class Dashboard extends React.Component<Props, State> {
                       <TextField
                         className="float-right"
                         value={this.state.search}
-                        onChange={(e) => this.setState({ search: e.target.value })}
+                        onChange={(e) => this.setState({ search: e.target.value.toLowerCase().replace(/(?:^|\s)\S/g, function (a) { return a.toUpperCase(); }), currentPage: 1 })}
                       />
                     </Grid>
                   </Grid>
