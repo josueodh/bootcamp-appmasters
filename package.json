@@ -17,7 +17,7 @@
     "@types/react-dom": "^16.8.4",
     "@types/react-router-dom": "^4.3.4",
     "@types/recharts": "^1.8.14",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "chartist": "0.10.1",
     "chartist-plugin-legend": "^0.6.2",
     "classnames": "2.2.6",
